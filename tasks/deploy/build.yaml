@@ -15,6 +15,8 @@
     path: "{{ deploy_dir }}/{{ service_env_file_local }}"
     regexp: '^APP_ENV='
     line: "APP_ENV={{ service_env }}"
+  become_user: "{{ service_user }}"
+  become: true
   when: service_env_file_local != None and service_env_file_local and service_env_file_local|length > 0
 
 - name: "{{ service_name }} | deploy | build | Setting git version {{ git_version }}"
@@ -22,6 +24,8 @@
     path: "{{ deploy_dir }}/{{ service_env_file_local }}"
     regexp: '^APP_VERSION='
     line: "APP_VERSION={{ git_version }}"
+  become_user: "{{ service_user }}"
+  become: true
   when: service_env_file_local != None and service_env_file_local and service_env_file_local|length > 0
 
 - name: "{{ service_name }} | deploy | build | Checking build script"
@@ -32,4 +36,5 @@
 - name: "{{ service_name }} | deploy | build | Build service {{ git_version }}"
   ansible.builtin.command: "{{ deploy_dir }}/deploy/build.sh {{ deploy_dir }}"
   become_user: "{{ service_user }}"
+  become: true
   when: build_script_stat.stat.exists

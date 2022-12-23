@@ -16,9 +16,11 @@
     age: "{{ clean_after_days }}d"
     recurse: false
   register: versions_to_clean
+  become: true
 
 - name: "{{ service_name }} | deploy | clean | Remove versions older than {{ clean_after_days }} days"
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
   with_items: "{{ versions_to_clean.files }}"
+  become: true

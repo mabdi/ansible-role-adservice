@@ -15,6 +15,7 @@
     dest: "{{ service_dir }}-init"
     version: "{{ repo_version }}"
   become_user: "{{ service_user }}"
+  become: true
   when: not service_dir_stat.stat.exists
 
 - name: "{{ service_name }} | deploy | init | Check .env file"
@@ -53,9 +54,12 @@
     owner: "{{ service_user }}"
     group: "{{ service_user }}"
     state: link
+  become_user: "{{ service_user }}"
+  become: true
   when: not service_dir_stat.stat.exists
 
 - name: "{{ service_name }} | deploy | init | Change service dir into symbolic link {{ service_dir }} -> {{ service_dir }}-init"
   ansible.builtin.command: "mv {{ service_dir }} {{ service_dir }}-init && ln -s {{ service_dir }}-init {{ service_dir }}"
   when: service_dir_stat.stat.exists and service_dir_stat.stat.isdir
   become_user: "{{ service_user }}"
+  become: true

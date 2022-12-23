@@ -5,6 +5,8 @@
     path: "{{ deploy_dir }}/{{ service_env_file_local }}"
     regexp: '^APP_MAINTENANCE='
     line: "APP_MAINTENANCE=1"
+  become_user: "{{ service_user }}"
+  become: true
   when: service_env_file_local != None and service_env_file_local and service_env_file_local|length > 0
 
 - name: "{{ service_name }} | deploy | reload | Copy new version int service dir {{ service_dir }}"
@@ -14,15 +16,19 @@
     owner: "{{ service_user }}"
     group: "{{ service_user }}"
     state: link
+  become_user: "{{ service_user }}"
+  become: true
 
 - name: "{{ service_name }} | deploy | reload | Change service dir owner" # noqa no-changed-when
   ansible.builtin.command: "chown -h {{ service_user }}:{{ service_user }} {{ service_dir }}"
+  become: true
   args:
     warn: false
 
 - name: "{{ service_name }} | deploy | reload | Refresh env"
   ansible.builtin.command: "{{ deploy_refresh }}"
   become_user: "{{ service_user }}"
+  become: true
   when: deploy_refresh != None and deploy_refresh and deploy_refresh|length > 0
 
 - name: "{{ service_name }} | deploy | reload | Checking migrate script"
@@ -33,6 +39,7 @@
 - name: "{{ service_name }} | deploy | reload | Migrate service"
   ansible.builtin.command: "{{ service_dir }}/deploy/migrate.sh {{ service_dir }}"
   become_user: "{{ service_user }}"
+  become: true
   when: migrate_script_stat.stat.exists
 
 - name: "{{ service_name }} | deploy | reload | Stop maintenance"
@@ -40,16 +47,20 @@
     path: "{{ service_dir }}/{{ service_env_file_local }}"
     regexp: '^APP_MAINTENANCE='
     line: "APP_MAINTENANCE=0"
+  become_user: "{{ service_user }}"
+  become: true
   when: service_env_file_local != None and service_env_file_local and service_env_file_local|length > 0
 
 - name: "{{ service_name }} | deploy | reload | Refresh env"
   ansible.builtin.command: "{{ deploy_refresh }}"
   become_user: "{{ service_user }}"
+  become: true
   when: deploy_refresh != None and deploy_refresh and deploy_refresh|length > 0
 
 - name: "{{ service_name }} | deploy | reload | Clear cache"
   ansible.builtin.command: "{{ deploy_clear }}"
   become_user: "{{ service_user }}"
+  become: true
   when: deploy_clear != None and deploy_clear and deploy_clear|length > 0
 
 - name: "{{ service_name }} | deploy | reload | Restart services"
@@ -59,3 +70,4 @@
   loop: "{{ deploy_services if deploy_services is iterable else [] }}"
   loop_control:
     loop_var: deploy_service
+  become: true

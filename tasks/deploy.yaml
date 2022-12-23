@@ -10,14 +10,23 @@
 
 - name: "{{ service_name }} | deploy | Init service"
   include_tasks: deploy/init.yaml
+  args:
+    apply:
+      become: true
   when: not service_dir_stat.stat.exists or service_dir_stat.stat.isdir
 
 - name: "{{ service_name }} | deploy | Deploy JWT"
   include_tasks: deploy/jwt.yaml
+  args:
+    apply:
+      become: true
   when: copy_jwt or create_jwt
 
 - name: "{{ service_name }} | deploy | Create storage"
   include_tasks: deploy/storage.yaml
+  args:
+    apply:
+      become: true
   when: service_storage_dir != None and service_storage_dir and service_storage_dir|length > 0
 
 - name: "{{ service_name }} | deploy | Update service"

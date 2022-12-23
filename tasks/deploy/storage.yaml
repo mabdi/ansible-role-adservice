@@ -23,6 +23,8 @@
     path: "{{ storage_dir }}/{{ service_name }}"
     state: directory
     mode: "0775"
+    owner: "{{ service_user }}"
+    group: "{{ service_user }}"
   when: not storage_dir_stat.stat.exists and not service_storage_dir_stat.stat.exists
 
 - name: "{{ service_name }} | deploy | storage | Copy service storage dir {{ service_storage_dir }}"

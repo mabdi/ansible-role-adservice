@@ -5,6 +5,7 @@
     src: "{{ service_dir }}/"
     dest: "{{ deploy_dir }}"
   delegate_to: "{{ inventory_hostname }}"
+  become: true
 
 - name: "{{ service_name }} | deploy | update | Purge"
   ansible.builtin.file:
@@ -24,11 +25,13 @@
     version: "{{ repo_version }}"
     force: true
   become_user: "{{ service_user }}"
+  become: true
 
 - name: "{{ service_name }} | deploy | update | Get service git version"
   ansible.builtin.command: "git -C {{ deploy_dir }} describe --tags --always" # noqa command-instead-of-module
   register: cmd
   become_user: "{{ service_user }}"
+  become: true
   changed_when: false
 
 - name: "{{ service_name }} | deploy | update | Read service git version"
